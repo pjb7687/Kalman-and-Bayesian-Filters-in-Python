@@ -1,8 +1,21 @@
 from __future__ import print_function
 import io
-import IPython.nbformat as nbformat
+import nbformat
 import sys
 from formatting import *
+
+
+def inplace_change(filename, old_string, new_string):
+    # Safely read the input filename using 'with'
+    with open(filename, encoding='utf-8') as f:
+        s = f.read()
+        if old_string not in s:
+            return
+
+    # Safely write the changed content, if found in the file
+    with open(filename, 'w', encoding='utf-8') as f:
+        s = s.replace(old_string, new_string)
+        f.write(s)
 
 
 def merge_notebooks(outfile, filenames):
@@ -11,7 +24,7 @@ def merge_notebooks(outfile, filenames):
     for fname in filenames:
         with io.open(fname, 'r', encoding='utf-8') as f:
             nb = nbformat.read(f, nbformat.NO_CONVERT)
-            remove_formatting(nb)
+            #remove_formatting(nb)
             if not added_appendix and fname[0:8] == 'Appendix':
                 remove_links_add_appendix(nb)
                 added_appendix = True
@@ -27,30 +40,30 @@ def merge_notebooks(outfile, filenames):
 
 
 if __name__ == '__main__':
-    f = open('book.ipynb', 'w', encoding='utf-8')
-    '''merge_notebooks(
-        ['../00_Preface.ipynb',
-         '../01_g-h_filter.ipynb',
-         '../Appendix_A_Installation.ipynb'])'''
+    with open('book.ipynb', 'w', encoding='utf-8') as f:
 
-    merge_notebooks(f,
-        ['../00-Preface.ipynb',
-         '../01-g-h-filter.ipynb',
-         '../02-Discrete-Bayes.ipynb',
-         '../03-Gaussians.ipynb',
-         '../04-One-Dimensional-Kalman-Filters.ipynb',
-         '../05-Multivariate-Gaussians.ipynb',
-         '../06-Multivariate-Kalman-Filters.ipynb',
-         '../07-Kalman-Filter-Math.ipynb',
-         '../08-Designing-Kalman-Filters.ipynb',
-         '../09-Nonlinear-Filtering.ipynb',
-         '../10-Unscented-Kalman-Filter.ipynb',
-         '../11-Extended-Kalman-Filters.ipynb',
-         '../12-Particle-Filters.ipynb',
-         '../13-Smoothing.ipynb',
-         '../14-Adaptive-Filtering.ipynb',
-         '../Appendix-A-Installation.ipynb',
-         '../Appendix-B-Symbols-and-Notations.ipynb',
-         '../Appendix-C-Walking-Through-KF-Code.ipynb',
-         '../Appendix-D-HInfinity-Filters.ipynb',
-         '../Appendix-E-Ensemble-Kalman-Filters.ipynb'])
+        merge_notebooks(f,
+            ['./tmp/00-Preface.ipynb',
+             './tmp/01-g-h-filter.ipynb',
+             './tmp/02-Discrete-Bayes.ipynb',
+             './tmp/03-Gaussians.ipynb',
+             './tmp/04-One-Dimensional-Kalman-Filters.ipynb',
+             './tmp/05-Multivariate-Gaussians.ipynb',
+             './tmp/06-Multivariate-Kalman-Filters.ipynb',
+             './tmp/07-Kalman-Filter-Math.ipynb',
+             './tmp/08-Designing-Kalman-Filters.ipynb',
+             './tmp/09-Nonlinear-Filtering.ipynb',
+             './tmp/10-Unscented-Kalman-Filter.ipynb',
+             './tmp/11-Extended-Kalman-Filters.ipynb',
+             './tmp/12-Particle-Filters.ipynb',
+             './tmp/13-Smoothing.ipynb',
+             './tmp/14-Adaptive-Filtering.ipynb',
+             './tmp/Appendix-A-Installation.ipynb',
+             './tmp/Appendix-B-Symbols-and-Notations.ipynb',
+             './tmp/Appendix-D-HInfinity-Filters.ipynb',
+             './tmp/Appendix-E-Ensemble-Kalman-Filters.ipynb'])
+
+
+    #remove text printed for matplotlib charts
+    inplace_change('book.ipynb', '<IPython.core.display.Javascript object>', '')
+    inplace_change('book.ipynb', '<IPython.core.display.HTML object>', '')
